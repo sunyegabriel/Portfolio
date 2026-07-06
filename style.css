@@ -233,6 +233,34 @@ a {
 
 /* Projects */
 
+.projectFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 4px 0 28px;
+}
+
+.filterBtn {
+  appearance: none;
+  border: 1.5px solid rgba(17, 24, 39, 0.14);
+  background: #fff;
+  color: #111827;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, border-color 0.18s;
+}
+
+.filterBtn:hover,
+.filterBtn.active {
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
+}
+
 .projectsGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -254,6 +282,10 @@ a {
 
 .projectCard:hover {
   border-color: var(--blue);
+}
+
+.projectCard.is-hidden {
+  display: none;
 }
 
 .projectCard--featured {
