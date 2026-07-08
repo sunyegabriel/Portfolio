@@ -188,41 +188,92 @@ a {
 }
 
 .transcendingMark {
-  display: grid;
-  max-width: 620px;
-  margin: 16px 0 24px;
+  position: relative;
+  width: min(100%, 620px);
+  min-height: 225px;
+  margin: 22px 0 34px;
   color: #111827;
-  line-height: 0.95;
+  line-height: 0.9;
 }
 
 .transcendingMark span {
   display: block;
+  position: absolute;
 }
 
 .markTop {
+  top: 0;
+  left: 15%;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(42px, 5.1vw, 68px);
+  font-size: clamp(46px, 5.4vw, 72px);
   font-weight: 700;
   letter-spacing: 0;
 }
 
 .markAmp {
-  width: fit-content;
-  margin: -2px 0 -4px 42%;
-  color: var(--blue);
+  top: 58px;
+  left: 46%;
+  color: #111827;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(42px, 5vw, 72px);
-  font-style: italic;
+  font-size: clamp(42px, 5vw, 70px);
   font-weight: 700;
-  transform: rotate(-7deg);
+  transform: rotate(-4deg);
 }
 
-.markBottom {
-  margin-left: 14%;
+.markBetween {
+  top: 116px;
+  left: 4%;
+  color: #050b16;
+  font-size: clamp(34px, 4.2vw, 58px);
+  font-weight: 800;
+  letter-spacing: 0;
+  transform: rotate(-2deg);
+}
+
+.markCultural {
+  top: 91px;
+  left: 50%;
   color: var(--blue);
-  font-size: clamp(30px, 3.8vw, 54px);
+  font-size: clamp(38px, 4.6vw, 62px);
   font-weight: 850;
   letter-spacing: 0;
+}
+
+.markBoundaries {
+  top: 142px;
+  left: 45%;
+  color: var(--blue);
+  font-size: clamp(38px, 4.6vw, 62px);
+  font-weight: 850;
+  letter-spacing: 0;
+}
+
+.markBetween::before,
+.markCultural::before,
+.markBoundaries::before {
+  content: "";
+  position: absolute;
+  right: -18px;
+  bottom: 0.04em;
+  left: -10px;
+  height: 0.14em;
+  border-radius: 999px;
+  background: rgba(47, 128, 255, 0.24);
+  transform: rotate(-2deg);
+  z-index: -1;
+}
+
+.markBetween::before {
+  background: rgba(47, 128, 255, 0.18);
+}
+
+.insightPoints {
+  margin-top: 8px;
+}
+
+.insightPoints p {
+  margin: 0 0 20px;
+  line-height: 1.72;
 }
 
 .ctaRow {
@@ -1091,21 +1142,42 @@ footer {
   }
 
   .transcendingMark {
-    margin: 14px 0 22px;
+    min-height: 170px;
+    margin: 18px 0 30px;
   }
 
   .markTop {
-    font-size: 40px;
+    top: 0;
+    left: 8%;
+    font-size: 36px;
   }
 
   .markAmp {
-    margin-left: 34%;
-    font-size: 46px;
+    top: 43px;
+    left: 42%;
+    font-size: 42px;
   }
 
-  .markBottom {
-    margin-left: 6%;
+  .markBetween {
+    top: 90px;
+    left: 0;
     font-size: 31px;
+  }
+
+  .markCultural {
+    top: 71px;
+    left: 47%;
+    font-size: 34px;
+  }
+
+  .markBoundaries {
+    top: 112px;
+    left: 38%;
+    font-size: 34px;
+  }
+
+  .insightPoints p {
+    margin-bottom: 18px;
   }
 
   .projectImg img {
