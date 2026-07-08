@@ -60,6 +60,7 @@
   let crystals = [];
   let orbs = [];
   let sparkles = [];
+  let npcs = [];
 
   canvas.width = width;
   canvas.height = height;
@@ -98,6 +99,7 @@
     crystals = Array.from({ length: 8 }, () => new Crystal(random(width), random(height * 0.72, height - 8)));
     orbs = Array.from({ length: 24 }, () => new Orb(random(width), random(height)));
     sparkles = Array.from({ length: 36 }, () => new Sparkle(random(width), random(height)));
+    npcs = Array.from({ length: 26 }, () => new NpcFigure());
   }
 
   async function loadDetector() {
@@ -289,15 +291,63 @@
       this.y = y;
       this.phase = random(0, Math.PI * 2);
       this.angle = random(0, Math.PI * 2);
-      this.radius = random(width * 0.13, width * 0.36);
-      this.speed = random(-0.025, 0.025) || 0.012;
+      this.radius = random(width * 0.1, width * 0.38);
+      this.radiusY = random(height * 0.1, height * 0.32);
+      this.speed = (Math.random() < 0.5 ? -1 : 1) * random(0.0035, 0.010);
+      this.pathMode = Math.floor(random(0, 5));
+      this.arcScale = random(0.58, 1.65);
+      this.drift = random(0.002, 0.006);
     }
 
     orbit(target, flatten = 1) {
       if (!target) return false;
       this.angle += this.speed;
-      this.x = target.x + Math.cos(this.angle) * this.radius;
-      this.y = target.y + Math.sin(this.angle) * this.radius * flatten;
+      const t = this.angle + this.phase;
+      let ox = 0;
+      let oy = 0;
+
+      if (this.pathMode === 0) {
+        ox = Math.cos(t) * this.radius * this.arcScale;
+        oy = Math.sin(t) * this.radiusY * flatten;
+      } else if (this.pathMode === 1) {
+        ox = Math.sin(t) * this.radius * 0.72;
+        oy = Math.sin(t * 2 + this.phase) * this.radiusY * 0.55 * flatten;
+      } else if (this.pathMode === 2) {
+        ox = Math.cos(t) * this.radius * (0.55 + 0.28 * Math.sin(t * 3));
+        oy = Math.sin(t * 1.35) * this.radiusY * this.arcScale * flatten;
+      } else if (this.pathMode === 3) {
+        const wave = Math.sin(t * 1.2) * this.radiusY * 0.24;
+        ox = Math.cos(t) * this.radius * 1.15;
+        oy = Math.sign(Math.sin(t)) * this.radiusY * 0.72 * flatten + wave;
+      } else {
+        const marginX = width * 0.12;
+        const marginY = height * 0.12;
+        const perimeter = (width - marginX * 2) * 2 + (height - marginY * 2) * 2;
+        const facePull = 0.28 + 0.18 * Math.sin(t * 0.7 + this.phase);
+        let d = ((t * 90) % perimeter + perimeter) % perimeter;
+        let px = marginX;
+        let py = marginY;
+        const top = width - marginX * 2;
+        const side = height - marginY * 2;
+        if (d < top) {
+          px = marginX + d;
+          py = marginY;
+        } else if (d < top + side) {
+          px = width - marginX;
+          py = marginY + d - top;
+        } else if (d < top * 2 + side) {
+          px = width - marginX - (d - top - side);
+          py = height - marginY;
+        } else {
+          px = marginX;
+          py = height - marginY - (d - top * 2 - side);
+        }
+        ox = px - target.x + (target.x - width * 0.5) * facePull;
+        oy = py - target.y + (target.y - height * 0.5) * facePull;
+      }
+
+      this.x = target.x + ox;
+      this.y = target.y + oy;
       return true;
     }
   }
@@ -307,7 +357,7 @@
       super(x, y);
       this.size = size;
       this.hue = random(268, 332);
-      this.speed = random(0.008, 0.018);
+      this.speed = (Math.random() < 0.5 ? -1 : 1) * random(0.003, 0.007);
     }
 
     update(target) {
@@ -402,7 +452,7 @@
       super(x, y);
       this.size = random(5, 14);
       this.hue = random(35, 75);
-      this.speed = random(0.01, 0.03);
+      this.speed = (Math.random() < 0.5 ? -1 : 1) * random(0.004, 0.012);
     }
 
     update(target) {
@@ -456,7 +506,150 @@
     }
   }
 
+  class NpcFigure {
+    constructor() {
+      this.kind = Math.floor(random(0, 5));
+      this.x = random(-width * 0.1, width * 1.1);
+      this.y = random(height * 0.08, height * 0.92);
+      this.size = random(width * 0.018, width * 0.055);
+      this.hue = random(18, 340);
+      this.phase = random(0, Math.PI * 2);
+      this.vx = random(-0.22, 0.22);
+      this.vy = random(-0.08, 0.08);
+      this.depth = random(0.32, 0.72);
+      if (Math.abs(this.vx) < 0.06) this.vx = this.vx < 0 ? -0.08 : 0.08;
+    }
+
+    update(target) {
+      const pull = target ? 0.0008 : 0;
+      this.x += this.vx + Math.sin(frame * 0.004 + this.phase) * 0.08;
+      this.y += this.vy + Math.cos(frame * 0.005 + this.phase) * 0.08;
+      if (target) {
+        this.x += (target.x - this.x) * pull;
+        this.y += (target.y - this.y) * pull;
+      }
+      if (this.x < -this.size * 3) this.x = width + this.size * 3;
+      if (this.x > width + this.size * 3) this.x = -this.size * 3;
+      if (this.y < -this.size * 3) this.y = height + this.size * 3;
+      if (this.y > height + this.size * 3) this.y = -this.size * 3;
+    }
+
+    draw() {
+      ctx.save();
+      ctx.globalAlpha = this.depth;
+      ctx.translate(this.x, this.y);
+      ctx.rotate(Math.sin(frame * 0.006 + this.phase) * 0.45);
+      if (this.kind === 0) this.drawPetal();
+      if (this.kind === 1) this.drawFlower();
+      if (this.kind === 2) this.drawBird();
+      if (this.kind === 3) this.drawImp();
+      if (this.kind === 4) this.drawTinyBeast();
+      ctx.restore();
+    }
+
+    drawPetal() {
+      const s = this.size;
+      ctx.fillStyle = hsl(this.hue, 74, 76, 0.62);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, s * 0.42, s * 1.1, 0.55, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = hsl(this.hue + 20, 70, 88, 0.38);
+      ctx.beginPath();
+      ctx.moveTo(0, -s);
+      ctx.quadraticCurveTo(s * 0.2, 0, 0, s);
+      ctx.stroke();
+    }
+
+    drawFlower() {
+      const s = this.size;
+      ctx.fillStyle = hsl(this.hue, 78, 70, 0.66);
+      for (let i = 0; i < 6; i++) {
+        ctx.save();
+        ctx.rotate((Math.PI * 2 * i) / 6);
+        ctx.beginPath();
+        ctx.ellipse(0, -s * 0.52, s * 0.22, s * 0.48, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      ctx.fillStyle = hsl(48, 92, 72, 0.86);
+      ctx.beginPath();
+      ctx.arc(0, 0, s * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    drawBird() {
+      const s = this.size;
+      ctx.fillStyle = hsl(this.hue, 52, 54, 0.62);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, s * 0.72, s * 0.38, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(s * 0.58, -s * 0.12, s * 0.22, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = hsl(42, 90, 68, 0.72);
+      ctx.beginPath();
+      ctx.moveTo(s * 0.78, -s * 0.12);
+      ctx.lineTo(s * 1.08, -s * 0.22);
+      ctx.lineTo(s * 0.82, s * 0.02);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = hsl(this.hue + 80, 60, 78, 0.48);
+      ctx.beginPath();
+      ctx.moveTo(-s * 0.05, -s * 0.06);
+      ctx.quadraticCurveTo(-s * 0.55, -s * 0.86, -s * 1.05, -s * 0.22);
+      ctx.stroke();
+    }
+
+    drawImp() {
+      const s = this.size;
+      ctx.fillStyle = hsl(this.hue, 58, 48, 0.58);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, s * 0.5, s * 0.72, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-s * 0.26, -s * 0.52);
+      ctx.lineTo(-s * 0.55, -s * 0.96);
+      ctx.lineTo(-s * 0.06, -s * 0.64);
+      ctx.moveTo(s * 0.24, -s * 0.52);
+      ctx.lineTo(s * 0.5, -s * 0.94);
+      ctx.lineTo(s * 0.08, -s * 0.64);
+      ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,.7)";
+      ctx.beginPath();
+      ctx.arc(-s * 0.16, -s * 0.08, s * 0.08, 0, Math.PI * 2);
+      ctx.arc(s * 0.16, -s * 0.08, s * 0.08, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    drawTinyBeast() {
+      const s = this.size;
+      ctx.fillStyle = hsl(this.hue, 42, 50, 0.56);
+      ctx.beginPath();
+      ctx.ellipse(0, 0, s * 0.82, s * 0.45, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(s * 0.72, -s * 0.08, s * 0.28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = hsl(this.hue + 40, 50, 74, 0.46);
+      ctx.lineWidth = Math.max(1, s * 0.08);
+      for (let i = -1; i <= 1; i++) {
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.1 + i * s * 0.24, s * 0.35);
+        ctx.lineTo(-s * 0.2 + i * s * 0.24, s * 0.72);
+        ctx.stroke();
+      }
+      ctx.beginPath();
+      ctx.moveTo(-s * 0.72, -s * 0.1);
+      ctx.quadraticCurveTo(-s * 1.16, -s * 0.56, -s * 1.28, s * 0.08);
+      ctx.stroke();
+    }
+  }
+
   function updateAndDraw(target) {
+    npcs.forEach((npc) => {
+      npc.update(target);
+      npc.draw();
+    });
     crystals.forEach((item) => item.draw());
     mushrooms.forEach((item) => {
       item.update(target);
