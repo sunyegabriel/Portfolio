@@ -135,12 +135,21 @@ a {
 }
 
 .heroTitle {
+  max-width: 1100px;
   text-align: center;
   font-weight: 800;
-  letter-spacing: -0.02em;
-  line-height: 1.05;
-  margin: 30px 0 28px;
-  font-size: clamp(40px, 5vw, 72px);
+  letter-spacing: 0;
+  line-height: 0.98;
+  margin: 30px auto 28px;
+  font-size: clamp(36px, 5.7vw, 80px);
+}
+
+.heroTitle span {
+  display: block;
+}
+
+.heroTitle .blue {
+  display: inline;
 }
 
 .blue {
@@ -166,8 +175,54 @@ a {
   color: #1f2937;
 }
 
+.introLead {
+  margin: 0 0 28px;
+  color: #08111f;
+  font-size: clamp(19px, 2.1vw, 26px);
+  line-height: 1.48;
+  font-weight: 520;
+}
+
 .introText strong {
   font-weight: 800;
+}
+
+.transcendingMark {
+  display: grid;
+  max-width: 620px;
+  margin: 16px 0 24px;
+  color: #111827;
+  line-height: 0.95;
+}
+
+.transcendingMark span {
+  display: block;
+}
+
+.markTop {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(42px, 5.1vw, 68px);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.markAmp {
+  width: fit-content;
+  margin: -2px 0 -4px 42%;
+  color: var(--blue);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(42px, 5vw, 72px);
+  font-style: italic;
+  font-weight: 700;
+  transform: rotate(-7deg);
+}
+
+.markBottom {
+  margin-left: 14%;
+  color: var(--blue);
+  font-size: clamp(30px, 3.8vw, 54px);
+  font-weight: 850;
+  letter-spacing: 0;
 }
 
 .ctaRow {
@@ -1025,6 +1080,32 @@ footer {
   .sectionPanel {
     padding: 22px 16px 18px;
     border-radius: 22px;
+  }
+
+  .heroTitle {
+    font-size: clamp(38px, 12vw, 56px);
+  }
+
+  .introLead {
+    font-size: 18px;
+  }
+
+  .transcendingMark {
+    margin: 14px 0 22px;
+  }
+
+  .markTop {
+    font-size: 40px;
+  }
+
+  .markAmp {
+    margin-left: 34%;
+    font-size: 46px;
+  }
+
+  .markBottom {
+    margin-left: 6%;
+    font-size: 31px;
   }
 
   .projectImg img {
