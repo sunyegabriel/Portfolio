@@ -13,7 +13,7 @@ document.querySelectorAll('[data-heritage-model]').forEach((modelBlock) => {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xf4f7fb);
 
-  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 5000);
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 5000);
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -24,10 +24,10 @@ document.querySelectorAll('[data-heritage-model]').forEach((modelBlock) => {
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
   controls.dampingFactor = 0.08;
-  controls.autoRotate = true;
+  controls.autoRotate = false;
   controls.autoRotateSpeed = 0.55;
-  controls.minDistance = 60;
-  controls.maxDistance = 900;
+  controls.minZoom = 0.45;
+  controls.maxZoom = 5;
 
   const ambient = new THREE.HemisphereLight(0xffffff, 0x9aa8bc, 2.2);
   scene.add(ambient);
@@ -53,13 +53,19 @@ document.querySelectorAll('[data-heritage-model]').forEach((modelBlock) => {
   let model = null;
   let frameId = null;
   let initialCamera = null;
+  let modelViewSize = 300;
 
   function resize() {
     const rect = viewport.getBoundingClientRect();
     const width = Math.max(320, rect.width);
     const height = Math.max(320, rect.height);
+    const aspect = width / height;
+
     renderer.setSize(width, height, false);
-    camera.aspect = width / height;
+    camera.left = (-modelViewSize * aspect) / 2;
+    camera.right = (modelViewSize * aspect) / 2;
+    camera.top = modelViewSize / 2;
+    camera.bottom = -modelViewSize / 2;
     camera.updateProjectionMatrix();
   }
 
@@ -81,10 +87,14 @@ document.querySelectorAll('[data-heritage-model]').forEach((modelBlock) => {
 
     floor.position.y = box.min.y - 4;
 
-    const distance = maxDim * 1.55;
+    modelViewSize = maxDim * 1.24;
+    resize();
+
+    const distance = maxDim * 2.2;
     camera.near = Math.max(0.1, maxDim / 100);
     camera.far = maxDim * 20;
-    camera.position.set(distance * 0.95, distance * 0.34, distance * 1.28);
+    camera.position.set(distance * 0.34, distance * 0.16, distance * 1.15);
+    camera.zoom = 1;
     camera.updateProjectionMatrix();
 
     controls.target.set(0, 0, 0);
@@ -95,6 +105,7 @@ document.querySelectorAll('[data-heritage-model]').forEach((modelBlock) => {
     initialCamera = {
       position: camera.position.clone(),
       target: controls.target.clone(),
+      zoom: camera.zoom,
     };
   }
 
@@ -158,8 +169,10 @@ document.querySelectorAll('[data-heritage-model]').forEach((modelBlock) => {
   resetButton?.addEventListener('click', () => {
     if (!initialCamera) return;
     camera.position.copy(initialCamera.position);
+    camera.zoom = initialCamera.zoom;
+    camera.updateProjectionMatrix();
     controls.target.copy(initialCamera.target);
-    controls.autoRotate = true;
+    controls.autoRotate = false;
     controls.update();
   });
 
