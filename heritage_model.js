@@ -84,7 +84,7 @@ document.querySelectorAll('[data-heritage-model]').forEach((modelBlock) => {
     const distance = maxDim * 1.55;
     camera.near = Math.max(0.1, maxDim / 100);
     camera.far = maxDim * 20;
-    camera.position.set(distance * 0.95, distance * 0.62, distance * 1.15);
+    camera.position.set(distance * 0.95, distance * 0.34, distance * 1.28);
     camera.updateProjectionMatrix();
 
     controls.target.set(0, 0, 0);
