@@ -1473,10 +1473,10 @@ footer {
 }
 
 .heritageIlluminatedTitle .titleName img {
-  width: clamp(88px, 11vw, 148px);
+  width: clamp(150px, 17vw, 230px);
   height: auto;
-  margin-right: -0.16em;
-  transform: translateY(0.12em);
+  margin-right: -0.26em;
+  transform: translateY(0.2em);
 }
 
 .heritageIlluminatedTitle .titleName span {
